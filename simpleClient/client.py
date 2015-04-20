@@ -7,6 +7,7 @@ import wx.lib.newevent
 import wx.html
 import time
 import requests
+import serial
 
 # http://sourceforge.net/p/pyserial/code/HEAD/tree/trunk/pyserial/examples/wxTerminal.py
 # http://wxpython.org/Phoenix/docs/html/events_overview.html
@@ -44,6 +45,10 @@ class simpleFrame(wx.Frame):
     self.html.SetPage("<center><h1>Level is: %s</h1></center>" % code.text)
 
   def readSerial(self):
+    #
+    # DUMMY CODE, put actual code to read serial port here, and when it gets stuff
+    # send an event to check access in the serial function and update the gui
+    #
     while True:
       evt = s(attr1="event data here")
       wx.PostEvent(self,evt)

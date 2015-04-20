@@ -1,0 +1,12 @@
+* simple client
+  Simple client is a simple wxPython GUI program that reads from the serial
+	port from a thread, checks access, and updates the GUI with the status of
+	the access lookup.
+
+** install
+   - download and install wxPython: http://www.wxpython.org/download.php
+   - pip install requests
+   - pip install pyserial
+
+** configuration
+	 all configuration is done in the run.cfg file.
