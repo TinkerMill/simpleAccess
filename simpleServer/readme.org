@@ -30,6 +30,13 @@
 		#+begin_src sh
     curl http://localhost:5000/device/<deviceid>/user/<userid>
 		#+end_src
+*** device access via dongle code
+		this is the important function, this will allow you to supply the device id
+		and the dongle code, and find out if that dongle has access to the device. The format
+		of the result is a number indicating the access level.
+		#+begin_src sh
+    curl http://localhost:5000/device/<deviceid>/code/<code>
+		#+end_src
 *** user list
 		this will list out all the users.  The format is a comma separated list of
 		user id:user name: *0:matt,1:ron*

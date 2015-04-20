@@ -4,11 +4,23 @@
 
 from flask import Flask,g
 import sqlite3
+import ConfigParser
+import sys
+import os
 
 app = Flask("simpleServer")
 
-DATABASE = 'db.db'
-PASSWORD = 'a'
+C_database=''
+C_password=''
+
+c = ConfigParser.SafeConfigParser()
+if os.path.isfile("run.cfg"):
+  c.read('run.cfg')
+  C_database = c.get('config', 'database')
+  C_password = c.get('config', 'password')
+else:
+  print("config run.cfg not found")
+  sys.exit(1)
 
 def init_db():
   with app.app_context():
@@ -26,7 +38,7 @@ def query_db(query, args=(), one=False):
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
-        db = g._database = sqlite3.connect(DATABASE)
+        db = g._database = sqlite3.connect(C_database)
     return db
 
 def insert(table, fields=(), values=()):
@@ -83,6 +95,14 @@ def deviceAccess(deviceid,userid):
   else:
     return "0"
 
+@app.route("/device/<deviceid>/code/<code>")
+def deviceCode(deviceid,code):
+  access = query_db("select userAccess.level from userAccess join user on user.id=userAccess.user where user.code='%s' and userAccess.device=%s" % (code,deviceid))
+  if len(access) > 0:
+    return  str(access[0][0])
+  else:
+    return "0"
+
 # return all users
 @app.route("/user")
 def userList():
@@ -115,7 +135,7 @@ def addUser(password,name,code):
 
 @app.route("/update/<password>/add/device/<name>/<description>")
 def addDevice(password,name,code):
-  if password == PASSWORD:
+  if password == C_password:
     id = insert("device", ['name','description'], [name,description])
     return str(id)
   else:
@@ -123,7 +143,7 @@ def addDevice(password,name,code):
 
 @app.route("/update/<password>/add/access/<userid>/<deviceid>/<level>")
 def addAccess(password,userid,deviceid,level):
-  if password == PASSWORD:
+  if password == C_password:
     id = insert("userAccess", ['user','device','level'], [userid,deviceid,level])
     return str(id)
   else:

@@ -10,10 +10,11 @@
 <li><a href="#sec-1-1-2">device information</a></li>
 <li><a href="#sec-1-1-3">device user list</a></li>
 <li><a href="#sec-1-1-4">device user access</a></li>
-<li><a href="#sec-1-1-5">user list</a></li>
-<li><a href="#sec-1-1-6">user info</a></li>
-<li><a href="#sec-1-1-7">user device list</a></li>
-<li><a href="#sec-1-1-8">user device access</a></li>
+<li><a href="#sec-1-1-5">device access via dongle code</a></li>
+<li><a href="#sec-1-1-6">user list</a></li>
+<li><a href="#sec-1-1-7">user info</a></li>
+<li><a href="#sec-1-1-8">user device list</a></li>
+<li><a href="#sec-1-1-9">user device access</a></li>
 </ul>
 </li>
 <li><a href="#sec-1-2">Updating the Database</a>
@@ -67,27 +68,35 @@ just a single number of the access level.
 
     curl http://localhost:5000/device/<deviceid>/user/<userid>
 
-### user list<a id="sec-1-1-5" name="sec-1-1-5"></a>
+### device access via dongle code<a id="sec-1-1-5" name="sec-1-1-5"></a>
+
+this is the important function, this will allow you to supply the device id
+and the dongle code, and find out if that dongle has access to the device. The format
+of the result is a number indicating the access level.
+
+    curl http://localhost:5000/device/<deviceid>/code/<code>
+
+### user list<a id="sec-1-1-6" name="sec-1-1-6"></a>
 
 this will list out all the users.  The format is a comma separated list of
 user id:user name: **0:matt,1:ron**
 
     curl http://localhost:5000/user
 
-### user info<a id="sec-1-1-6" name="sec-1-1-6"></a>
+### user info<a id="sec-1-1-7" name="sec-1-1-7"></a>
 
 this will return information on the user in a comma separated list: **0,matt**
 
     curl http://localhost:5000/user/<userid>
 
-### user device list<a id="sec-1-1-7" name="sec-1-1-7"></a>
+### user device list<a id="sec-1-1-8" name="sec-1-1-8"></a>
 
 this will return a list of all the devices a user has access to.  The format is a
 comma separated list of device id(s).
 
     curl http://localhost:5000/user/<userid>/device
 
-### user device access<a id="sec-1-1-8" name="sec-1-1-8"></a>
+### user device access<a id="sec-1-1-9" name="sec-1-1-9"></a>
 
 this will return the access level a user has to a device.
 
