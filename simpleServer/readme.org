@@ -1,0 +1,54 @@
+* Overview
+	The simple server is used to query for access on a device.  This is meant as a
+	very simple interface that easy easily acccessbile to many different device types
+	(arduino, pi..etc)  as such the return format is kept very simple so it is
+	easy for those devices to parse the output witout a lot of extra libraries or cpu.
+
+	The rest syntax is built in a way to allow you to walk through the data.
+
+** Usage
+*** device list
+	 This will return a list of all devices.  the format is a comma separted list of
+	 device id : device name: *0:laser cutter,1:3d printer*
+	 #+begin_src sh
+   curl http://localhost:5000/device
+	 #+end_src
+*** device information
+		this will return information on the device in a comma separted list: *1,3d printer,fancy 3d printer*
+		#+begin_src sh
+    curl http://localhost:5000/device/<deviceid>
+		#+end_src
+*** device user list
+		this will return a list of all user IDs that have access to the device.  The format
+		of the results are userid:username in a comma separated list.
+		#+begin_src sh
+    curl http://localhost:5000/device/<deviceid>/user
+		#+end_src
+*** device user access
+		this will return the access a userid has to a device.  The format is
+		just a single number of the access level.
+		#+begin_src sh
+    curl http://localhost:5000/device/<deviceid>/user/<userid>
+		#+end_src
+*** user list
+		this will list out all the users.  The format is a comma separated list of
+		user id:user name: *0:matt,1:ron*
+		#+begin_src sh
+    curl http://localhost:5000/user
+		#+end_src
+*** user info
+		this will return information on the user in a comma separated list: *0,matt*
+		#+begin_src sh
+    curl http://localhost:5000/user/<userid>
+		#+end_src
+*** user device list
+		this will return a list of all the devices a user has access to.  The format is a
+		comma separated list of device id(s).
+		#+begin_src sh
+    curl http://localhost:5000/user/<userid>/device
+		#+end_src
+*** user device access
+		this will return the access level a user has to a device.
+		#+begin_src sh
+    curl http://localhost:5000/user/<userid>/device/<deviceid>
+		#+end_src
