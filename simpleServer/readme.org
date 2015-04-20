@@ -1,20 +1,20 @@
 * Overview
 	The simple server is used to query for access on a device.  This is meant as a
-	very simple interface that easy easily acccessbile to many different device types
+	very simple interface that easy easily accessible to many different device types
 	(arduino, pi..etc)  as such the return format is kept very simple so it is
-	easy for those devices to parse the output witout a lot of extra libraries or cpu.
+	easy for those devices to parse the output without a lot of extra libraries or cpu.
 
 	The rest syntax is built in a way to allow you to walk through the data.
 
 ** Usage
 *** device list
-	 This will return a list of all devices.  the format is a comma separted list of
+	 This will return a list of all devices.  the format is a comma separated list of
 	 device id : device name: *0:laser cutter,1:3d printer*
 	 #+begin_src sh
    curl http://localhost:5000/device
 	 #+end_src
 *** device information
-		this will return information on the device in a comma separted list: *1,3d printer,fancy 3d printer*
+		this will return information on the device in a comma separated list: *1,3d printer,fancy 3d printer*
 		#+begin_src sh
     curl http://localhost:5000/device/<deviceid>
 		#+end_src
@@ -51,4 +51,20 @@
 		this will return the access level a user has to a device.
 		#+begin_src sh
     curl http://localhost:5000/user/<userid>/device/<deviceid>
+		#+end_src
+
+
+** Updating the Database
+	 This will go away in the future, but for now, this is how you can easily add records.
+*** add a user
+		#+begin_src sh
+    curl http://localhost:5000/update/a/add/user/<name>/<badgecode>
+		#+end_src
+*** add a device
+		#+begin_src sh
+    curl http://localhost:5000/update/a/add/device/<name>/<description>
+		#+end_src
+*** add device access
+		#+begin_src sh
+    curl http://localhost:5000/update/a/add/access/<userid>/<deviceid>/<levelofaccess>
 		#+end_src

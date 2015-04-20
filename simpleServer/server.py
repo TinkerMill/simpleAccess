@@ -8,6 +8,7 @@ import sqlite3
 app = Flask("simpleServer")
 
 DATABASE = 'db.db'
+PASSWORD = 'a'
 
 def init_db():
   with app.app_context():
@@ -27,6 +28,20 @@ def get_db():
     if db is None:
         db = g._database = sqlite3.connect(DATABASE)
     return db
+
+def insert(table, fields=(), values=()):
+  # g.db is the database connection
+  cur = get_db().cursor()
+  query = 'INSERT INTO %s (%s) VALUES (%s)' % (
+    table,
+    ', '.join(fields),
+    ', '.join(['?'] * len(values))
+  )
+  cur.execute(query, values)
+  get_db().commit()
+  id = cur.lastrowid
+  cur.close()
+  return id
 
 @app.teardown_appcontext
 def close_connection(exception):
@@ -89,6 +104,30 @@ def userDeviceList(userid):
   for device in query_db("select device from userAccess where user=%s" % userid):
     devices.append( str(device[0]))
   return ",".join(devices)
+
+@app.route("/update/<password>/add/user/<name>/<code>")
+def addUser(password,name,code):
+  if password == PASSWORD:
+    id = insert("user", ['name','code'], [name,code])
+    return str(id)
+  else:
+    return "-1"
+
+@app.route("/update/<password>/add/device/<name>/<description>")
+def addDevice(password,name,code):
+  if password == PASSWORD:
+    id = insert("device", ['name','description'], [name,description])
+    return str(id)
+  else:
+    return "-1"
+
+@app.route("/update/<password>/add/access/<userid>/<deviceid>/<level>")
+def addAccess(password,userid,deviceid,level):
+  if password == PASSWORD:
+    id = insert("userAccess", ['user','device','level'], [userid,deviceid,level])
+    return str(id)
+  else:
+    return "-1"
 
 
 if __name__ == "__main__":

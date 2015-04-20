@@ -16,6 +16,13 @@
 <li><a href="#sec-1-1-8">user device access</a></li>
 </ul>
 </li>
+<li><a href="#sec-1-2">Updating the Database</a>
+<ul>
+<li><a href="#sec-1-2-1">add a user</a></li>
+<li><a href="#sec-1-2-2">add a device</a></li>
+<li><a href="#sec-1-2-3">add device access</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -25,9 +32,9 @@
 # Overview<a id="sec-1" name="sec-1"></a>
 
 The simple server is used to query for access on a device.  This is meant as a
-very simple interface that easy easily acccessbile to many different device types
+very simple interface that easy easily accessible to many different device types
 (arduino, pi..etc)  as such the return format is kept very simple so it is
-easy for those devices to parse the output witout a lot of extra libraries or cpu.
+easy for those devices to parse the output without a lot of extra libraries or cpu.
 
 The rest syntax is built in a way to allow you to walk through the data.
 
@@ -35,14 +42,14 @@ The rest syntax is built in a way to allow you to walk through the data.
 
 ### device list<a id="sec-1-1-1" name="sec-1-1-1"></a>
 
-This will return a list of all devices.  the format is a comma separted list of
+This will return a list of all devices.  the format is a comma separated list of
 device id : device name: **0:laser cutter,1:3d printer**
 
     curl http://localhost:5000/device
 
 ### device information<a id="sec-1-1-2" name="sec-1-1-2"></a>
 
-this will return information on the device in a comma separted list: **1,3d printer,fancy 3d printer**
+this will return information on the device in a comma separated list: **1,3d printer,fancy 3d printer**
 
     curl http://localhost:5000/device/<deviceid>
 
@@ -85,3 +92,19 @@ comma separated list of device id(s).
 this will return the access level a user has to a device.
 
     curl http://localhost:5000/user/<userid>/device/<deviceid>
+
+## Updating the Database<a id="sec-1-2" name="sec-1-2"></a>
+
+This will go away in the future, but for now, this is how you can easily add records.
+
+### add a user<a id="sec-1-2-1" name="sec-1-2-1"></a>
+
+    curl http://localhost:5000/update/a/add/user/<name>/<badgecode>
+
+### add a device<a id="sec-1-2-2" name="sec-1-2-2"></a>
+
+    curl http://localhost:5000/update/a/add/device/<name>/<description>
+
+### add device access<a id="sec-1-2-3" name="sec-1-2-3"></a>
+
+    curl http://localhost:5000/update/a/add/access/<userid>/<deviceid>/<levelofaccess>
