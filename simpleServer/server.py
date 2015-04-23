@@ -1,12 +1,24 @@
 #!/usr/bin/python
 
 # http://flask.pocoo.org/docs/0.10/patterns/sqlite3/
+# http://ryrobes.com/python/running-python-scripts-as-a-windows-service/
+# http://stackoverflow.com/questions/23550067/deploy-flask-app-as-windows-service
 
-from flask import Flask,g
+from flask import Flask,g,request
 import sqlite3
 import ConfigParser
 import sys
 import os
+
+# http://sourceforge.net/projects/pywin32/files/pywin32/Build%20219/
+# pywin32-219.win32-py2.7.exe
+import win32service
+import win32serviceutil
+import win32api
+import win32con
+import win32event
+import win32evtlogutil
+import servicemanager
 
 app = Flask("simpleServer")
 
@@ -14,13 +26,36 @@ C_database=''
 C_password=''
 
 c = ConfigParser.SafeConfigParser()
-if os.path.isfile("run.cfg"):
-  c.read('run.cfg')
+if os.path.isfile("E:/checkedoutRepos/simpleAccess/simpleServer/run.cfg"):
+  c.read('E:/checkedoutRepos/simpleAccess/simpleServer/run.cfg')
   C_database = c.get('config', 'database')
   C_password = c.get('config', 'password')
 else:
   print("config run.cfg not found")
   sys.exit(1)
+
+
+class aservice(win32serviceutil.ServiceFramework):
+
+  _svc_name_ = "simpleServer"
+  _svc_display_name_ = "simple access server"
+  _svc_description_ = "Control access to devices"
+
+  def __init__(self, args):
+    win32serviceutil.ServiceFramework.__init__(self,args)
+    self.hWaitStop = win32event.CreateEvent(None,0,0,None)
+
+  def SvcStop(self):
+    self.ReportServiceStatus(win32service.SERVICE_STOP_PENDING)
+    self.ReportServiceStatus(win32service.SERVICE_STOPPED)
+
+  def SvcDoRun(self):
+    import servicemanager
+    servicemanager.LogMsg(servicemanager.EVENTLOG_INFORMATION_TYPE,servicemanager.PYS_SERVICE_STARTED,(self._svc_name_, ''))
+    self.main()
+
+  def main(self):
+    app.run(host='0.0.0.0')
 
 def init_db():
   with app.app_context():
@@ -151,4 +186,4 @@ def addAccess(password,userid,deviceid,level):
 
 
 if __name__ == "__main__":
-  app.run(debug=True)
+  win32serviceutil.HandleCommandLine(aservice)
