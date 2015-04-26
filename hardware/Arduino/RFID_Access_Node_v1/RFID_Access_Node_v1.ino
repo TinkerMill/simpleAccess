@@ -87,7 +87,7 @@ void loop() {
 
   while (Serial1.available() > 0) {
     int readByte = Serial1.read();
-    Serial.print(readByte);
+    Serial.write(readByte);
     tagRead = true;
   }
   delay(500);
