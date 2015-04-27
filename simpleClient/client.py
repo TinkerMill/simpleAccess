@@ -45,6 +45,9 @@ class simpleFrame(wx.Frame):
 
   def configUser(self):
     self.sizer.Clear()
+    self.logout = wx.Button(self, wx.ID_ANY, u"Logout")
+    self.sizer.Add(self.logout)
+    self.logout.Bind( wx.EVT_BUTTON, self.logoutfunc)
 
   def configTrainer(self):
     self.sizer.Clear()
@@ -52,13 +55,16 @@ class simpleFrame(wx.Frame):
     self.scantext.value = "Student Name"
     self.sizer.Add(self.scantext)
 
+  def logoutfunc(self,evt):
+    print("Logout called")
+
   def serial(self, evt):
     # if you are just looking for badge acess
     if self.scanMode == "badge":
       # evt.attr  is the data sent via the serial read, hopefully its the badge code
       # in this static example i'm just setting the badge code to abcde
       usercode = "04001D4868"
-      usercode = "150060E726"
+      #usercode = "150060E726"
 
       # now i'm talking to the server to figure out if the badge code has access to this
       # device which i've hard coded as 0
