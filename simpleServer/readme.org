@@ -6,6 +6,25 @@
 
 	The rest syntax is built in a way to allow you to walk through the data.
 
+** install
+	 Steps to install the software
+	 - for the server to run as a windows service, you'll need pywin32, which you can
+		 download from [[http://sourceforge.net/projects/pywin32/files/pywin32/Build%20219/][here]]  I used the pywin32-219.win32-py2.7.exe  version
+	 - make sure flask is installed:  pip install flask
+	 - currently the configuration file location is hard coded in the the server.py
+		 program.  update the path to point to the run.cfg file.
+	 - update run.cfg and point the database to a place that exists.
+	 - if you change the password make sure you update the client to use that password.
+	 - If you make changes to the schema, there is a cleardb.bat script you can run
+		 from the directory that contains server.py.  This will DELETE the current database
+		 and recreate it with the schema.sql file.
+	 - the schema.sql file is the schema of the database.  Update this if you want to make
+		 any changes
+   - When you are ready to run the software as a service, change to the directory that
+		 contains server.py  and run: python server.py install
+	 - once the service is installed you can also start and stop the service by running:
+		 python server.py start , or , python server.py stop
+
 ** Usage
 *** device list
 	 This will return a list of all devices.  the format is a comma separated list of
