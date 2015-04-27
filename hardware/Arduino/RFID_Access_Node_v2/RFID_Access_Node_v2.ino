@@ -42,7 +42,11 @@ char relayPin = 9;
 char futureInput1Pin = A2;
 char futureInput2Pin = A3;
 
-String myString;
+// Calculate based on max input size expected for one command
+#define INPUT_SIZE 30
+
+char* memberName;
+int accessLevel;
 
 void setup() {
   pinMode(relayPin, OUTPUT);
@@ -63,27 +67,54 @@ void setup() {
   lcd.setCursor(3, 0);
   lcd.print("TINKERMILL");
   lcd.setCursor(2, 1);
-  lcd.print("RFID Node v1");
+  lcd.print("RFID Node v2");
   delay(1500);
   lcd.clear();
 }
 
 void loop() {  
-  //when serial data is sent to the pro micro over the usb
-  //it is stored in a string and then printed back out over the usb
-  if (Serial.available() > 0) {
-    myString = Serial.readString();
-    Serial.println(myString);
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print(myString);
-    delay(1500);
-    lcd.clear();
-  }
+  // Reset memberName and accessLevel
+  memberName="";
+  accessLevel=0;
+
+  //  Look for command from PC via USB serial
+    if(Serial.available() >0) {
+      // Get next command from Serial (add 1 for final 0)
+      char input[INPUT_SIZE + 1];
+      byte size = Serial.readBytes(input, INPUT_SIZE);
+      // Add the final 0 to end the C string
+      input[size] = 0;
+
+      // Read each command pair 
+      char* command = strtok(input, "&");
+      while (command != 0) {
+        // Split the command in two values
+        char* separator = strchr(command, ':');
+        if (separator != 0){
+          // Actually split the string in 2: replace ':' with 0
+          *separator = 0;
+          //char* servoId = atoi(command);
+          memberName = command;
+          ++separator;
+          accessLevel = atoi(separator);
+
+        } 
+      // Find the next command in input string
+      command = strtok(0, "&");
+      }
+    }
+    if (accessLevel >= 1){
+      accessGranted();
+    }
+    if (accessLevel == -1){
+      accessDenied();
+    }
+
   
   //defualt screen while waiting for a tag scan
   lcd.setCursor(1, 0);
   lcd.print("READY TO SCAN");
+  lcd.setCursor(2, 1);
 
   while (Serial1.available() > 0) {
     int readByte = Serial1.read();
@@ -92,10 +123,77 @@ void loop() {
   }
   delay(500);
   if (tagRead) {
-    readSuccess();
+    accessGranted();
     tagRead = false;
   }
   setColor(DARKSLATEBLUE, 6);
+}
+
+void accessGranted() {
+  lcd.clear();
+  lcd.setCursor(4, 0);
+  lcd.print("ACCESS");
+  lcd.setCursor(3, 1);
+  lcd.print("GRANTED");
+  delay(500);
+  lcd.clear();
+  lcd.setCursor(0, 1);
+  lcd.print("In Use: ");
+  lcd.setCursor(8, 1);
+  lcd.print(memberName);
+
+  
+  digitalWrite(relayPin, HIGH);
+  setColor(GREEN, 6);
+  successBeeps();
+}
+    
+void accessDenied() {
+  lcd.clear();
+  lcd.setCursor(4, 0);
+  lcd.print("ACCESS");
+  lcd.setCursor(4, 1);
+  lcd.print("DENIED");
+  setColor(RED, 6);
+  failBeeps();
+  
+  digitalWrite(relayPin, LOW);
+  delay(500);
+  lcd.clear();
+}
+
+void successBeeps() {
+   for (int thisNote = 0; thisNote < 4; thisNote++) {
+    // to calculate the note duration, take one second
+    // divided by the note type.
+    //e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
+    int noteDuration = 700 / successNoteDurations[thisNote];
+    tone(8, successMelody[thisNote], noteDuration);
+    // to distinguish the notes, set a minimum time between them.
+    // the note's duration + 30% seems to work well:
+    int pauseBetweenNotes = noteDuration * 1.30;
+    delay(pauseBetweenNotes);
+    // stop the tone playing:
+    noTone(8);
+  }
+} 
+
+void failBeeps() {
+  for (int thisNote = 0; thisNote < 5; thisNote++) {
+
+    // to calculate the note duration, take one second
+    // divided by the note type.
+    //e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
+    int noteDuration = 1000 / failNoteDurations[thisNote];
+    tone(8, failMelody[thisNote], noteDuration);
+
+    // to distinguish the notes, set a minimum time between them.
+    // the note's duration + 30% seems to work well:
+    int pauseBetweenNotes = noteDuration * 1.30;
+    delay(pauseBetweenNotes);
+    // stop the tone playing:
+    noTone(8);
+  }
 }
 
 void setColor(unsigned long color, byte brightness) {
@@ -115,55 +213,5 @@ void clearLEDs() {
   for (int i = 0; i < LED_COUNT; i++) {
     leds.setPixelColor(i, 0);
     leds.show();
-  }
-}
-
-void readSuccess() {
-  lcd.clear();
-  lcd.setCursor(3, 0);
-  lcd.print("CARD READ");
-  lcd.setCursor(4, 1);
-  lcd.print("SUCCESS");
-
-  digitalWrite(relayPin, HIGH);
-
-  setColor(GREEN, 6);
-
-  for (int thisNote = 0; thisNote < 4; thisNote++) {
-    // to calculate the note duration, take one second
-    // divided by the note type.
-    //e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
-    int noteDuration = 700 / successNoteDurations[thisNote];
-    tone(8, successMelody[thisNote], noteDuration);
-    // to distinguish the notes, set a minimum time between them.
-    // the note's duration + 30% seems to work well:
-    int pauseBetweenNotes = noteDuration * 1.30;
-    delay(pauseBetweenNotes);
-    // stop the tone playing:
-    noTone(8);
-  }
-
-  delay(900);
-  
-  digitalWrite(relayPin, LOW);
-  
-  lcd.clear();
-}
-
-void failBeeps() {
-  for (int thisNote = 0; thisNote < 5; thisNote++) {
-
-    // to calculate the note duration, take one second
-    // divided by the note type.
-    //e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
-    int noteDuration = 1000 / failNoteDurations[thisNote];
-    tone(8, failMelody[thisNote], noteDuration);
-
-    // to distinguish the notes, set a minimum time between them.
-    // the note's duration + 30% seems to work well:
-    int pauseBetweenNotes = noteDuration * 1.30;
-    delay(pauseBetweenNotes);
-    // stop the tone playing:
-    noTone(8);
   }
 }
