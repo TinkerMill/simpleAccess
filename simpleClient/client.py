@@ -31,9 +31,9 @@ class simpleFrame(wx.Frame):
   def __init__(self,parent,ID,title):
     wx.Frame.__init__(self, parent,ID,title)
 
-    sizer = wx.BoxSizer(wx.VERTICAL)
-    self.scantext = wx.TextCtrl(self)
-    sizer.Add(self.scantext)
+    self.sizer = wx.BoxSizer(wx.VERTICAL)
+
+
 
     #self.html = wx.html.HtmlWindow( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.html.HW_SCROLLBAR_AUTO )
     #self.html = wx.html2.WebView.New( self)
@@ -41,25 +41,39 @@ class simpleFrame(wx.Frame):
     self.Bind(  serialrx, self.serial)
     self.t = Thread(target=self.readSerial)
     self.t.start()
-
-    self.scantext.value = "Student Name"
     self.scanMode = "badge"
+
+  def configUser(self):
+    self.sizer.Clear()
+
+  def configTrainer(self):
+    self.sizer.Clear()
+    self.scantext = wx.TextCtrl(self)
+    self.scantext.value = "Student Name"
+    self.sizer.Add(self.scantext)
 
   def serial(self, evt):
     # if you are just looking for badge acess
     if self.scanMode == "badge":
       # evt.attr  is the data sent via the serial read, hopefully its the badge code
       # in this static example i'm just setting the badge code to abcde
-      usercode = "abcde"
+      usercode = "04001D4868"
+      usercode = "150060E726"
 
       # now i'm talking to the server to figure out if the badge code has access to this
       # device which i've hard coded as 0
 
       code = requests.get( url="%s/device/0/code/%s" % ( C_server, usercode) )
-
+      code = int(code.text)
       # now i'm updating the html on the screen with the status
       # self.html.SetPage("<center><h1>Level is: %s</h1></center>" % code.text)
-      self.m_statusBar1.SetStatusText("Level is: %s" % levels[int(code.text)])
+
+      self.m_statusBar1.SetStatusText("Level is: %s" % levels[code])
+      if code == 1:
+        self.configUser()
+      elif code == 2:
+        self.configTrainer()
+
 
     elif self.scanMode == "scanStudent":
       # scan in the student id so we can add the record as a trainer
@@ -73,7 +87,7 @@ class simpleFrame(wx.Frame):
     while True:
       evt = s(attr1="event data here")
       wx.PostEvent(self,evt)
-      time.sleep(5)
+      time.sleep(60)
 
   def onClose(self,event):
     self.t.stop()

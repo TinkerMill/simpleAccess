@@ -13,6 +13,6 @@ insert into device (id, name, description) values (1, '3d printer', 'fancy 3d pr
 insert into user (id, name, code) values (0, 'matt', '04001D4868');
 insert into user (id, name, code) values (1, 'ron', '150060E726');
 
-insert into userAccess(id, user, device, level) values(0,0,0,1,1,datetime('now'),datetime('now'));
-insert into userAccess(id, user, device, level) values(1,0,1,2,1,datetime('now'),datetime('now'));
-insert into userAccess(id, user, device, level) values(2,1,0,1,1,datetime('now'),datetime('now'));
+insert into userAccess(id, user, device, level, trainer, datecreated, datemodified) values(0,0,0,1,1,datetime('now'),datetime('now'));
+insert into userAccess(id, user, device, level, trainer, datecreated, datemodified) values(1,0,1,2,1,datetime('now'),datetime('now'));
+insert into userAccess(id, user, device, level, trainer, datecreated, datemodified) values(2,1,0,2,1,datetime('now'),datetime('now'));
