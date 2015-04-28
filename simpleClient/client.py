@@ -12,6 +12,7 @@ import serial
 
 # http://sourceforge.net/p/pyserial/code/HEAD/tree/trunk/pyserial/examples/wxTerminal.py
 # http://wxpython.org/Phoenix/docs/html/events_overview.html
+# http://wiki.wxpython.org/Timer
 # wxFormBuilder
 
 levels = ['No Access', 'User', 'Trainer']
@@ -29,61 +30,64 @@ s,serialrx = wx.lib.newevent.NewEvent()
 
 class simpleFrame(wx.Frame):
   def __init__(self,parent,ID,title):
-    wx.Frame.__init__(self, parent,ID,title)
+    wx.Frame.__init__(self, parent,ID,title, size=wx.Size(300,200) )
 
+    self.EnableCloseButton(False)
+    self.timeleft = 0
     self.sizer = wx.BoxSizer(wx.VERTICAL)
-
-
-
-    #self.html = wx.html.HtmlWindow( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.html.HW_SCROLLBAR_AUTO )
-    #self.html = wx.html2.WebView.New( self)
     self.m_statusBar1 = self.CreateStatusBar( 1, wx.ST_SIZEGRIP, wx.ID_ANY )
     self.Bind(  serialrx, self.serial)
     self.t = Thread(target=self.readSerial)
     self.t.start()
-    self.scanMode = "badge"
+    self.SetSizer(self.sizer)
+    self.Layout()
+    self.Centre( wx.BOTH )
 
-  def configUser(self):
-    self.sizer.Clear()
-    self.logout = wx.Button(self, wx.ID_ANY, u"Logout")
-    self.sizer.Add(self.logout)
-    self.logout.Bind( wx.EVT_BUTTON, self.logoutfunc)
+    self.timer = wx.Timer(self, 100)
+    wx.EVT_TIMER(self, 100, self.ontimer)
 
-  def configTrainer(self):
-    self.sizer.Clear()
-    self.scantext = wx.TextCtrl(self)
-    self.scantext.value = "Student Name"
-    self.sizer.Add(self.scantext)
+  def ontimer(self,evt):
+    self.guitime.SetValue( self.timeleft )
+    self.timeleft = self.timeleft - 1
+
+    if self.timeleft < 0:
+      self.logoutfunc(False)
 
   def logoutfunc(self,evt):
-    print("Logout called")
+    self.timer.Stop()
+    self.sizer.Clear(True)
+    self.sizer.AddSpacer( ( 0, 30), 1, wx.EXPAND, 5 )
+    self.sizer.Add( wx.StaticText( self, wx.ID_ANY, u"Scan Badge to login" ),wx.ALL|wx.ALIGN_CENTER,5)
+    self.m_statusBar1.SetStatusText("Scan Badge to login")
+    self.Layout()
 
   def serial(self, evt):
-    # if you are just looking for badge acess
-    if self.scanMode == "badge":
-      # evt.attr  is the data sent via the serial read, hopefully its the badge code
-      # in this static example i'm just setting the badge code to abcde
-      usercode = "04001D4868"
-      #usercode = "150060E726"
+    usercode = "04001D4868"
+    #usercode = "150060E726"
 
-      # now i'm talking to the server to figure out if the badge code has access to this
-      # device which i've hard coded as 0
+    code = requests.get( url="%s/device/0/code/%s" % ( C_server, usercode) )
+    code = int(code.text)
 
-      code = requests.get( url="%s/device/0/code/%s" % ( C_server, usercode) )
-      code = int(code.text)
-      # now i'm updating the html on the screen with the status
-      # self.html.SetPage("<center><h1>Level is: %s</h1></center>" % code.text)
+    self.m_statusBar1.SetStatusText("Level is: %s" % levels[code])
 
-      self.m_statusBar1.SetStatusText("Level is: %s" % levels[code])
-      if code == 1:
-        self.configUser()
-      elif code == 2:
-        self.configTrainer()
+    # if they have access to the machine
+    if code > 0:
+      self.timeleft = 60 * 20
+      self.sizer.Clear(True)
+      self.logout = wx.Button(self, wx.ID_ANY, u"Logout", wx.DefaultPosition, wx.DefaultSize, wx.BU_EXACTFIT)
+      self.timertext  = wx.StaticText( self, wx.ID_ANY, u"Time Left" )
+      self.guitime = wx.Gauge( self, wx.ID_ANY, 1200 , wx.DefaultPosition, wx.DefaultSize, wx.GA_HORIZONTAL)
 
-
-    elif self.scanMode == "scanStudent":
-      # scan in the student id so we can add the record as a trainer
-      pass
+      self.sizer.AddSpacer( ( 0, 30), 1, wx.EXPAND, 5 )
+      self.sizer.Add(self.timertext, wx.ALL|wx.ALIGN_CENTER,5)
+      self.sizer.Add(self.guitime,  wx.ALL|wx.ALIGN_CENTER,5)
+      self.sizer.AddSpacer( ( 0, 20), 1, wx.EXPAND, 5 )
+      self.sizer.Add(self.logout, wx.ALL|wx.ALIGN_CENTER,5)
+      self.sizer.AddSpacer( ( 0, 20), 1, wx.EXPAND, 5 )
+      self.guitime.SetValue(self.timeleft)
+      self.logout.Bind( wx.EVT_BUTTON, self.logoutfunc)
+      self.Layout()
+      self.timer.Start(1000)
 
   def readSerial(self):
     #
@@ -93,7 +97,7 @@ class simpleFrame(wx.Frame):
     while True:
       evt = s(attr1="event data here")
       wx.PostEvent(self,evt)
-      time.sleep(60)
+      time.sleep(10)
 
   def onClose(self,event):
     self.t.stop()
