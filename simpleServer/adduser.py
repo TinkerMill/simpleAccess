@@ -1,40 +1,69 @@
 import serial
 import sqlite3
 import sys
+import ConfigParser
+import pdb
+import os
 
-ser = serial.Serial("com13", "19200")
-db  = sqlite3.connect("db.db")
+c = ConfigParser.SafeConfigParser()
+if os.path.isfile('c:/data/simpleAccess/simpleServer/run.cfg'):
+  c.read('c:/data/simpleAccess/simpleServer/run.cfg')
+  C_database    = c.get('config', 'database')
+  C_serial      = c.get('config', 'serial')
+  C_serialspeed = c.get('config', 'serialspeed')
+  C_debug       = c.getboolean('config','debug')
+else:
+  print("config run.cfg not found")
+  sys.exit(1)
+
+
+
+if not C_debug:
+  ser = serial.Serial(C_serial, C_serialspeed)
+
+db  = sqlite3.connect(C_database)
 message = ""
 
 
-if len(sys.argv) != 4:
-	print("adduser.py <username> <level 0=none 1=user 2=trainer> <trainerid>")
-	sys.exit()
+if len(sys.argv) != 5:
+  print("adduser.py <username> <device> <level 0=none 1=user 2=trainer> <trainerid>")
+  sys.exit()
 
 username = sys.argv[1]
-level = sys.argv[2]
-trainer = sys.argv[3]
+device   = sys.argv[2]
+level    = sys.argv[3]
+trainer  = sys.argv[4]
 
-# so the first time we scan we get 1 thing of junk
-# the next scans we get 2 things of junk
-print("Scan Badge")
-message = ser.readline()[1:-2].strip()
-while len(message) != 12:
+if not C_debug:
+  # so the first time we scan we get 1 thing of junk
+  # the next scans we get 2 things of junk
   print("Scan Badge")
-  message = ser.readline()[2:-2].strip()
+  message = ser.readline()[1:-2].strip()
+  while len(message) != 12:
+    print("Scan Badge")
+    message = ser.readline()[2:-2].strip()
+else:
+  message = "04001D486839"
 
+#pdb.set_trace()
+
+# create the user if they don't already exist
 with db:
-	cur = db.cursor()
-	cur.execute("select * from user where code='%s'" % message)
-	
-	rows = cur.fetchall()
-	
-	# if the user already exists then update the record
-	if len(rows) > 0:
-		for row in rows:
-			print row[0]
-			cur.execute("update userAccess set level=%s where user=%s" % (level, row[0]) )
-	else:
-		cur.execute("insert into user (name, code) values ('%s', '%s');" % ( username, message) )
-		lid = cur.lastrowid
-		cur.execute("insert into userAccess(user, device, level, trainer, datecreated, datemodified) values(%s,0,%s,%s,datetime('now'),datetime('now'));" % (lid,level,trainer))
+  cur = db.cursor()
+
+  # if the user already exists then update the record
+  cur.execute("select * from user where code='%s'" % message)
+  lid = cur.fetchall()
+  if len(lid) == 0:
+    cur.execute("insert into user (name, code) values ('%s', '%s');" % ( username, message) )
+    lid = cur.lastrowid
+  else:
+    lid = lid[0][0]
+
+
+  cur.execute("delete from userAccess where user=%s and device=%s" % (lid, device))
+  cur.execute("insert into userAccess(user, device, level, trainer, datecreated, datemodified) values(%s,%s,%s,%s,datetime('now'),datetime('now'));" % (lid,device,level,trainer))
+
+
+
+# pdb.set_trace()

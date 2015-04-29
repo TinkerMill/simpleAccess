@@ -25,7 +25,23 @@
 	 - once the service is installed you can also start and stop the service by running:
 		 python server.py start , or , python server.py stop
 
-** Usage
+** User Access
+	 user access is done through the adduser.py script which is located within the server
+	 directory.
+	 #+begin_src sh
+   adduser.py <username> <device> <level 0=none 1=user 2=trainer> <trainerid>
+	 #+end_src
+	 The adduser script reads run.cfg to figure out the serial port and serial port speed
+	 at which to scan for the badge code.  Once you run the adduser command with the
+	 above options, it'll then ask you to scan the badge of the user you are entering
+	 access for.
+*** verify access
+		once you have users added, you can run the listuser.py script to list all the users
+		in the database, and what level of access they have.
+
+** API Usage
+	 The simple server has no access (currently) beyond a rest based API.
+
 *** device list
 	 This will return a list of all devices.  the format is a comma separated list of
 	 device id : device name: *0:laser cutter,1:3d printer*
