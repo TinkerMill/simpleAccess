@@ -22,6 +22,7 @@ if os.path.isfile("run.cfg"):
   c.read('run.cfg')
   C_server = c.get('config', 'server')
   C_serial = c.get('config', 'serial')
+  C_serial_speed  = c.get('config', 'serialspeed')
 else:
   print("config run.cfg not found")
   sys.exit(1)
@@ -31,7 +32,7 @@ s,serialrx = wx.lib.newevent.NewEvent()
 class simpleFrame(wx.Frame):
   def __init__(self,parent,ID,title):
     wx.Frame.__init__(self, parent,ID,title, size=wx.Size(300,200) )
-
+    self.ser = serial.Serial(C_serial, C_serial_speed)
     self.EnableCloseButton(False)
     self.timeleft = 0
     self.sizer = wx.BoxSizer(wx.VERTICAL)
@@ -45,6 +46,7 @@ class simpleFrame(wx.Frame):
 
     self.timer = wx.Timer(self, 100)
     wx.EVT_TIMER(self, 100, self.ontimer)
+	
 
   def ontimer(self,evt):
     self.guitime.SetValue( self.timeleft )
@@ -55,6 +57,7 @@ class simpleFrame(wx.Frame):
 
   def logoutfunc(self,evt):
     self.timer.Stop()
+    self.ser.write('user:1')
     self.sizer.Clear(True)
     self.sizer.AddSpacer( ( 0, 30), 1, wx.EXPAND, 5 )
     self.sizer.Add( wx.StaticText( self, wx.ID_ANY, u"Scan Badge to login" ),wx.ALL|wx.ALIGN_CENTER,5)
@@ -62,9 +65,9 @@ class simpleFrame(wx.Frame):
     self.Layout()
 
   def serial(self, evt):
-    usercode = "04001D4868"
-    #usercode = "150060E726"
-
+    usercode = evt.attr1
+    # print("got %s" % usercode)
+    print( "%s/device/0/code/%s" % ( C_server, usercode) )
     code = requests.get( url="%s/device/0/code/%s" % ( C_server, usercode) )
     code = int(code.text)
 
@@ -72,6 +75,7 @@ class simpleFrame(wx.Frame):
 
     # if they have access to the machine
     if code > 0:
+      self.ser.write('user:1')
       self.timeleft = 60 * 20
       self.sizer.Clear(True)
       self.logout = wx.Button(self, wx.ID_ANY, u"Logout", wx.DefaultPosition, wx.DefaultSize, wx.BU_EXACTFIT)
@@ -90,15 +94,11 @@ class simpleFrame(wx.Frame):
       self.timer.Start(1000)
 
   def readSerial(self):
-    #
-    # DUMMY CODE, put actual code to read serial port here, and when it gets stuff
-    # send an event to check access in the serial function and update the gui
-    #
     while True:
-      evt = s(attr1="event data here")
+      message = self.ser.readline()[2:-2].strip()
+      evt = s(attr1=message)
       wx.PostEvent(self,evt)
-      time.sleep(10)
-
+	  
   def onClose(self,event):
     self.t.stop()
 

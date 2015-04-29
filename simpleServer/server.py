@@ -26,8 +26,8 @@ C_database=''
 C_password=''
 
 c = ConfigParser.SafeConfigParser()
-if os.path.isfile("E:/checkedoutRepos/simpleAccess/simpleServer/run.cfg"):
-  c.read('E:/checkedoutRepos/simpleAccess/simpleServer/run.cfg')
+if os.path.isfile("c:/data/simpleAccess/simpleServer/run.cfg"):
+  c.read('c:/data/simpleAccess/simpleServer/run.cfg')
   C_database = c.get('config', 'database')
   C_password = c.get('config', 'password')
 else:
@@ -184,6 +184,6 @@ def addAccess(password,userid,deviceid,level):
   else:
     return "-1"
 
-
+#app.run(host='127.0.0.1', debug=True)
 if __name__ == "__main__":
   win32serviceutil.HandleCommandLine(aservice)

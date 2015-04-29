@@ -10,8 +10,8 @@ CREATE TABLE device(id INTEGER PRIMARY KEY, name TEXT, description TEXT);
 insert into device (id, name, description) values (0, 'laser cutter', '80w laser cutter');
 insert into device (id, name, description) values (1, '3d printer', 'fancy 3d printer');
 
-insert into user (id, name, code) values (0, 'matt', '04001D4868');
-insert into user (id, name, code) values (1, 'ron', '150060E726');
+-- insert into user (id, name, code) values (0, 'matt', '04001D486839');
+insert into user (id, name, code) values (1, 'ron', '150060E726B4');
 
 insert into userAccess(id, user, device, level, trainer, datecreated, datemodified) values(0,0,0,1,1,datetime('now'),datetime('now'));
 insert into userAccess(id, user, device, level, trainer, datecreated, datemodified) values(1,0,1,2,1,datetime('now'),datetime('now'));
