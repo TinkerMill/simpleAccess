@@ -4,18 +4,23 @@ import sys
 import ConfigParser
 import pdb
 import os
+import serial.tools.list_ports
 
 c = ConfigParser.SafeConfigParser()
 if os.path.isfile('c:/data/simpleAccess/simpleServer/run.cfg'):
   c.read('c:/data/simpleAccess/simpleServer/run.cfg')
   C_database    = c.get('config', 'database')
-  C_serial      = c.get('config', 'serial')
+  #C_serial      = c.get('config', 'serial')
   C_serialspeed = c.get('config', 'serialspeed')
   C_debug       = c.getboolean('config','debug')
 else:
   print("config run.cfg not found")
   sys.exit(1)
 
+ports = list(serial.tools.list_ports.comports())
+for p in ports:
+    if p[1][0:8] == "SparkFun":
+      C_serial = p[0]
 
 
 if not C_debug:

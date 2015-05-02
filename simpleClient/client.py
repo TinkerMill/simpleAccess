@@ -9,6 +9,7 @@ import wx.html2
 import time
 import requests
 import serial
+import serial.tools.list_ports
 
 # http://sourceforge.net/p/pyserial/code/HEAD/tree/trunk/pyserial/examples/wxTerminal.py
 # http://wxpython.org/Phoenix/docs/html/events_overview.html
@@ -21,7 +22,7 @@ c = ConfigParser.SafeConfigParser()
 if os.path.isfile("run.cfg"):
   c.read('run.cfg')
   C_server = c.get('config', 'server')
-  C_serial = c.get('config', 'serial')
+  #C_serial = c.get('config', 'serial')
   C_serial_speed  = c.get('config', 'serialspeed')
 else:
   print("config run.cfg not found")
@@ -46,7 +47,7 @@ class simpleFrame(wx.Frame):
 
     self.timer = wx.Timer(self, 100)
     wx.EVT_TIMER(self, 100, self.ontimer)
-	
+
 
   def ontimer(self,evt):
     self.guitime.SetValue( self.timeleft )
@@ -57,7 +58,7 @@ class simpleFrame(wx.Frame):
 
   def logoutfunc(self,evt):
     self.timer.Stop()
-    self.ser.write('user:1')
+    self.ser.write('user:-1')
     self.sizer.Clear(True)
     self.sizer.AddSpacer( ( 0, 30), 1, wx.EXPAND, 5 )
     self.sizer.Add( wx.StaticText( self, wx.ID_ANY, u"Scan Badge to login" ),wx.ALL|wx.ALIGN_CENTER,5)
@@ -92,13 +93,15 @@ class simpleFrame(wx.Frame):
       self.logout.Bind( wx.EVT_BUTTON, self.logoutfunc)
       self.Layout()
       self.timer.Start(1000)
+    else:
+	  self.ser.write('user:-1')
 
   def readSerial(self):
     while True:
       message = self.ser.readline()[2:-2].strip()
       evt = s(attr1=message)
       wx.PostEvent(self,evt)
-	  
+
   def onClose(self,event):
     self.t.stop()
 
@@ -108,6 +111,10 @@ class simpleApp(wx.App):
     frame.Show(True)
     return True
 
+ports = list(serial.tools.list_ports.comports())
+for p in ports:
+    if p[1][0:8] == "SparkFun":
+      C_serial = p[0]
 
 app = simpleApp(0)
 app.MainLoop()
