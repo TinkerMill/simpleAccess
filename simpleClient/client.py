@@ -77,7 +77,7 @@ class simpleFrame(wx.Frame):
     # if they have access to the machine
     if code > 0:
       self.ser.write('user:1')
-      self.timeleft = 60 * 20
+      self.timeleft = 60 * 60
       self.sizer.Clear(True)
       self.logout = wx.Button(self, wx.ID_ANY, u"Logout", wx.DefaultPosition, wx.DefaultSize, wx.BU_EXACTFIT)
       self.timertext  = wx.StaticText( self, wx.ID_ANY, u"Time Left" )
