@@ -10,12 +10,12 @@ db  = sqlite3.connect("db.db")
 for row in open("d.csv"):
   r = row.split(',')
   username = r[0]
-  message  = r[8]
+  message  = r[8].strip()
   device   = 0 #laser
   trainer  = 0 # bulk load ron
   level    = 1 # default access
 
-  if len(message) <= 10:
+  if len(message) <= 9:
     continue
 
   print "adding", username, message
