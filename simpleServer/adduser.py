@@ -43,12 +43,12 @@ if not C_debug:
   # so the first time we scan we get 1 thing of junk
   # the next scans we get 2 things of junk
   print("Scan Badge")
-  message = ser.readline()[1:-2].strip()
-  while len(message) != 12:
+  message = ser.readline()[1:-4].strip()
+  while len(message) != 10:
     print("Scan Badge")
-    message = ser.readline()[2:-2].strip()
+    message = ser.readline()[2:-4].strip()
 else:
-  message = "04001D486839"
+  message = "04001D4868"
 
 #pdb.set_trace()
 

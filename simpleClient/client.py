@@ -98,7 +98,7 @@ class simpleFrame(wx.Frame):
 
   def readSerial(self):
     while True:
-      message = self.ser.readline()[2:-2].strip()
+      message = self.ser.readline()[2:-4].strip()
       evt = s(attr1=message)
       wx.PostEvent(self,evt)
 
