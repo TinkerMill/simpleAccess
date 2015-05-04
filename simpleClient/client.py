@@ -17,6 +17,7 @@ import serial.tools.list_ports
 # wxFormBuilder
 
 levels = ['No Access', 'User', 'Trainer']
+C_serial = False
 
 c = ConfigParser.SafeConfigParser()
 if os.path.isfile("run.cfg"):
@@ -24,9 +25,20 @@ if os.path.isfile("run.cfg"):
   C_server = c.get('config', 'server')
   #C_serial = c.get('config', 'serial')
   C_serial_speed  = c.get('config', 'serialspeed')
+  C_timeout = 60 * c.getint('config','timeout')
 else:
   print("config run.cfg not found")
   sys.exit(1)
+
+# find the port that has the sparkfun device connected to it
+ports = list(serial.tools.list_ports.comports())
+for p in ports:
+    if p[1][0:8] == "SparkFun":
+      C_serial = p[0]
+
+if not C_serial:
+  print("No valid usb serial device found")
+  sys.exit()
 
 s,serialrx = wx.lib.newevent.NewEvent()
 
@@ -53,6 +65,8 @@ class simpleFrame(wx.Frame):
     self.guitime.SetValue( self.timeleft )
     self.timeleft = self.timeleft - 1
 
+    self.m_statusBar1.SetStatusText("Level is: %s Time Left: %d" % (levels[code], self.timeleft) )
+
     if self.timeleft < 0:
       self.logoutfunc(False)
 
@@ -77,11 +91,11 @@ class simpleFrame(wx.Frame):
     # if they have access to the machine
     if code > 0:
       self.ser.write('user:1')
-      self.timeleft = 60 * 60
+      self.timeleft = C_timeout
       self.sizer.Clear(True)
       self.logout = wx.Button(self, wx.ID_ANY, u"Logout", wx.DefaultPosition, wx.DefaultSize, wx.BU_EXACTFIT)
       self.timertext  = wx.StaticText( self, wx.ID_ANY, u"Time Left" )
-      self.guitime = wx.Gauge( self, wx.ID_ANY, 1200 , wx.DefaultPosition, wx.DefaultSize, wx.GA_HORIZONTAL)
+      self.guitime = wx.Gauge( self, wx.ID_ANY, C_timeout , wx.DefaultPosition, wx.DefaultSize, wx.GA_HORIZONTAL)
 
       self.sizer.AddSpacer( ( 0, 30), 1, wx.EXPAND, 5 )
       self.sizer.Add(self.timertext, wx.ALL|wx.ALIGN_CENTER,5)
@@ -111,10 +125,7 @@ class simpleApp(wx.App):
     frame.Show(True)
     return True
 
-ports = list(serial.tools.list_ports.comports())
-for p in ports:
-    if p[1][0:8] == "SparkFun":
-      C_serial = p[0]
+
 
 app = simpleApp(0)
 app.MainLoop()
