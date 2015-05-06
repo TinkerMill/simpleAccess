@@ -18,6 +18,7 @@ import serial.tools.list_ports
 
 levels = ['No Access', 'User', 'Trainer']
 C_serial = False
+C_code = False
 
 c = ConfigParser.SafeConfigParser()
 if os.path.isfile("run.cfg"):
@@ -65,7 +66,7 @@ class simpleFrame(wx.Frame):
     self.guitime.SetValue( self.timeleft )
     self.timeleft = self.timeleft - 1
 
-    self.m_statusBar1.SetStatusText("Level is: %s Time Left: %d" % (levels[code], self.timeleft) )
+    self.m_statusBar1.SetStatusText("User is: %s Time Left: %d minutes" % (self.userName , self.timeleft/60) )
 
     if self.timeleft < 0:
       self.logoutfunc(False)
@@ -80,17 +81,21 @@ class simpleFrame(wx.Frame):
     self.Layout()
 
   def serial(self, evt):
+    global C_code
     usercode = evt.attr1
     # print("got %s" % usercode)
     print( "%s/device/0/code/%s" % ( C_server, usercode) )
     code = requests.get( url="%s/device/0/code/%s" % ( C_server, usercode) )
     code = int(code.text)
+    C_code = code
 
     self.m_statusBar1.SetStatusText("Level is: %s" % levels[code])
 
     # if they have access to the machine
     if code > 0:
-      self.ser.write('user:1')
+      self.userName = requests.get( url="%s/user/code/%s" % ( C_server, usercode) )
+      self.userName = str(self.userName.text)
+      self.ser.write('%s:1' % self.userName)
       self.timeleft = C_timeout
       self.sizer.Clear(True)
       self.logout = wx.Button(self, wx.ID_ANY, u"Logout", wx.DefaultPosition, wx.DefaultSize, wx.BU_EXACTFIT)

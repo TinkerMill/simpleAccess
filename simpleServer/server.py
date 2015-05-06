@@ -146,6 +146,12 @@ def userList():
     userList.append("%d:%s" % (user[0], user[1]))
   return ",".join(userList)
 
+
+@app.route("/user/code/<code>")
+def userCodeInfo(code):
+  info = query_db("select name from user where code='%s'" % code)
+  return "%s" % info[0]
+
 # return info on a userid
 @app.route("/user/<userid>")
 def userInfo(userid):
