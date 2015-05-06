@@ -5,7 +5,7 @@ from threading import Thread
 import wx
 import wx.lib.newevent
 import wx.html2
-
+import datetime
 import time
 import requests
 import serial
@@ -19,14 +19,15 @@ import serial.tools.list_ports
 levels = ['No Access', 'User', 'Trainer']
 C_serial = False
 C_code = False
+C_log = False
 
 c = ConfigParser.SafeConfigParser()
 if os.path.isfile("run.cfg"):
   c.read('run.cfg')
   C_server = c.get('config', 'server')
-  #C_serial = c.get('config', 'serial')
   C_serial_speed  = c.get('config', 'serialspeed')
   C_timeout = 60 * c.getint('config','timeout')
+  C_log = c.get('config', 'logfile')
 else:
   print("config run.cfg not found")
   sys.exit(1)
@@ -42,6 +43,10 @@ if not C_serial:
   sys.exit()
 
 s,serialrx = wx.lib.newevent.NewEvent()
+
+def log(message):
+  with open(C_log, 'a') as the_file:
+    the_file.write(str(datetime.datetime.now()) + ":" + message + "\n")
 
 class simpleFrame(wx.Frame):
   def __init__(self,parent,ID,title):
@@ -73,11 +78,13 @@ class simpleFrame(wx.Frame):
 
   def logoutfunc(self,evt):
     self.timer.Stop()
+    log("%s stopped using device" % self.userName)
     self.ser.write('user:-1')
     self.sizer.Clear(True)
     self.sizer.AddSpacer( ( 0, 30), 1, wx.EXPAND, 5 )
     self.sizer.Add( wx.StaticText( self, wx.ID_ANY, u"Scan Badge to login" ),wx.ALL|wx.ALIGN_CENTER,5)
     self.m_statusBar1.SetStatusText("Scan Badge to login")
+    self.userName = False
     self.Layout()
 
   def serial(self, evt):
@@ -96,6 +103,9 @@ class simpleFrame(wx.Frame):
       self.userName = requests.get( url="%s/user/code/%s" % ( C_server, usercode) )
       self.userName = str(self.userName.text)
       self.ser.write('%s:1' % self.userName)
+      log("%s started using device" % self.userName)
+
+
       self.timeleft = C_timeout
       self.sizer.Clear(True)
       self.logout = wx.Button(self, wx.ID_ANY, u"Logout", wx.DefaultPosition, wx.DefaultSize, wx.BU_EXACTFIT)
@@ -113,14 +123,14 @@ class simpleFrame(wx.Frame):
       self.Layout()
       self.timer.Start(1000)
     else:
-	  self.ser.write('user:-1')
+      self.ser.write('user:-1')
 
   def readSerial(self):
     while True:
       message = self.ser.readline()[2:-4].strip()
       evt = s(attr1=message)
       wx.PostEvent(self,evt)
-
+      time.sleep(5)
   def onClose(self,event):
     self.t.stop()
 
