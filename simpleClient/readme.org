@@ -8,5 +8,14 @@
    - pip install requests
    - pip install pyserial
 
+** running simple client
+	 - start->run: cmd
+	 - cd \
+	 - cd data
+	 - cd simpleAccess
+	 - cd simpleClient
+	 - client.py
+	 - (you can minizmize the cmd window)
+
 ** configuration
 	 all configuration is done in the run.cfg file.

@@ -35,6 +35,16 @@
 	 at which to scan for the badge code.  Once you run the adduser command with the
 	 above options, it'll then ask you to scan the badge of the user you are entering
 	 access for.
+*** starting the utility
+		first make sure the client isn't running, since they can't share the serial
+		connection.
+		- start->run: cmd
+		- cd \
+		- cd data
+		- cd simpleAccess
+		- cd simpleServer
+		- adduser.py "Jon Doe" 0 1 0
+
 *** verify access
 		once you have users added, you can run the listuser.py script to list all the users
 		in the database, and what level of access they have.

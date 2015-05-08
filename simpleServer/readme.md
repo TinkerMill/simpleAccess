@@ -7,7 +7,8 @@
 <li><a href="#sec-1-1">install</a></li>
 <li><a href="#sec-1-2">User Access</a>
 <ul>
-<li><a href="#sec-1-2-1">verify access</a></li>
+<li><a href="#sec-1-2-1">starting the utility</a></li>
+<li><a href="#sec-1-2-2">verify access</a></li>
 </ul>
 </li>
 <li><a href="#sec-1-3">API Usage</a>
@@ -48,7 +49,6 @@ The rest syntax is built in a way to allow you to walk through the data.
 ## install<a id="sec-1-1" name="sec-1-1"></a>
 
 Steps to install the software
-
 -   for the server to run as a windows service, you'll need pywin32, which you can
     download from [here](http://sourceforge.net/projects/pywin32/files/pywin32/Build%20219/)  I used the pywin32-219.win32-py2.7.exe  version
 -   make sure flask is installed:  pip install flask
@@ -78,7 +78,18 @@ at which to scan for the badge code.  Once you run the adduser command with the
 above options, it'll then ask you to scan the badge of the user you are entering
 access for.
 
-### verify access<a id="sec-1-2-1" name="sec-1-2-1"></a>
+### starting the utility<a id="sec-1-2-1" name="sec-1-2-1"></a>
+
+first make sure the client isn't running, since they can't share the serial
+connection.
+-   start->run: cmd
+-   cd \\
+-   cd data
+-   cd simpleAccess
+-   cd simpleServer
+-   adduser.py "Jon Doe" 0 1 0
+
+### verify access<a id="sec-1-2-2" name="sec-1-2-2"></a>
 
 once you have users added, you can run the listuser.py script to list all the users
 in the database, and what level of access they have.
