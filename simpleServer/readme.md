@@ -48,7 +48,6 @@ The rest syntax is built in a way to allow you to walk through the data.
 ## install<a id="sec-1-1" name="sec-1-1"></a>
 
 Steps to install the software
-
 -   for the server to run as a windows service, you'll need pywin32, which you can
     download from [here](http://sourceforge.net/projects/pywin32/files/pywin32/Build%20219/)  I used the pywin32-219.win32-py2.7.exe  version
 -   make sure flask is installed:  pip install flask
@@ -71,12 +70,15 @@ Steps to install the software
 user access is done through the adduser.py script which is located within the server
 directory.
 
-    adduser.py <username> <device> <level 0=none 1=user 2=trainer> <trainerid>
+    adduser.py <username> <device> <level 0=none 1=user 2=trainer> <trainerid> <optional_badge_id>
 
 The adduser script reads run.cfg to figure out the serial port and serial port speed
 at which to scan for the badge code.  Once you run the adduser command with the
 above options, it'll then ask you to scan the badge of the user you are entering
 access for.
+
+if you specify the optional<sub>badge</sub><sub>id</sub> the serial port won't be used to scan the badge, and
+it'll use that value as the badge code.
 
 ### verify access<a id="sec-1-2-1" name="sec-1-2-1"></a>
 

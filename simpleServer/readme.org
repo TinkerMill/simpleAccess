@@ -29,12 +29,15 @@
 	 user access is done through the adduser.py script which is located within the server
 	 directory.
 	 #+begin_src sh
-   adduser.py <username> <device> <level 0=none 1=user 2=trainer> <trainerid>
+   adduser.py <username> <device> <level 0=none 1=user 2=trainer> <trainerid> <optional_badge_id>
 	 #+end_src
 	 The adduser script reads run.cfg to figure out the serial port and serial port speed
 	 at which to scan for the badge code.  Once you run the adduser command with the
 	 above options, it'll then ask you to scan the badge of the user you are entering
 	 access for.
+
+	 if you specify the optional_badge_id the serial port won't be used to scan the badge, and
+	 it'll use that value as the badge code.
 *** verify access
 		once you have users added, you can run the listuser.py script to list all the users
 		in the database, and what level of access they have.
