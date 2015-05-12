@@ -62,10 +62,10 @@ with db:
     lid = cur.lastrowid
   else:
     lid = lid[0][0]
-    cur.execute("delete from userAccess where user=%s and device=%s" % (lid, device))
 
 
 
+  cur.execute("delete from userAccess where user=%s and device=%s" % (lid, device))
   cur.execute("insert into userAccess(user, device, level, trainer, datecreated, datemodified) values(%s,%s,%s,%s,datetime('now'),datetime('now'));" % (lid,device,level,trainer))
 
 

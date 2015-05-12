@@ -7,7 +7,8 @@
 <li><a href="#sec-1-1">install</a></li>
 <li><a href="#sec-1-2">User Access</a>
 <ul>
-<li><a href="#sec-1-2-1">verify access</a></li>
+<li><a href="#sec-1-2-1">starting the utility</a></li>
+<li><a href="#sec-1-2-2">verify access</a></li>
 </ul>
 </li>
 <li><a href="#sec-1-3">API Usage</a>
@@ -80,7 +81,18 @@ access for.
 if you specify the optional<sub>badge</sub><sub>id</sub> the serial port won't be used to scan the badge, and
 it'll use that value as the badge code.
 
-### verify access<a id="sec-1-2-1" name="sec-1-2-1"></a>
+### starting the utility<a id="sec-1-2-1" name="sec-1-2-1"></a>
+
+first make sure the client isn't running, since they can't share the serial
+connection.
+-   start->run: cmd
+-   cd \\
+-   cd data
+-   cd simpleAccess
+-   cd simpleServer
+-   adduser.py "Jon Doe" 0 1 0
+
+### verify access<a id="sec-1-2-2" name="sec-1-2-2"></a>
 
 once you have users added, you can run the listuser.py script to list all the users
 in the database, and what level of access they have.

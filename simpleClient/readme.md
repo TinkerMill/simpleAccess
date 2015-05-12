@@ -5,7 +5,8 @@
 <li><a href="#sec-1">simple client</a>
 <ul>
 <li><a href="#sec-1-1">install</a></li>
-<li><a href="#sec-1-2">configuration</a></li>
+<li><a href="#sec-1-2">running simple client</a></li>
+<li><a href="#sec-1-3">configuration</a></li>
 </ul>
 </li>
 </ul>
@@ -24,6 +25,16 @@ the access lookup.
 -   pip install requests
 -   pip install pyserial
 
-## configuration<a id="sec-1-2" name="sec-1-2"></a>
+## running simple client<a id="sec-1-2" name="sec-1-2"></a>
+
+-   start->run: cmd
+-   cd \\
+-   cd data
+-   cd simpleAccess
+-   cd simpleClient
+-   client.py
+-   (you can minizmize the cmd window)
+
+## configuration<a id="sec-1-3" name="sec-1-3"></a>
 
 all configuration is done in the run.cfg file.
