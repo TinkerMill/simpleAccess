@@ -22,16 +22,11 @@ for p in ports:
     if p[1][0:8] == "SparkFun":
       C_serial = p[0]
 
-
-if not C_debug:
-  ser = serial.Serial(C_serial, C_serialspeed)
-
 db  = sqlite3.connect(C_database)
 message = ""
 
-
-if len(sys.argv) != 5:
-  print("adduser.py <username> <device> <level 0=none 1=user 2=trainer> <trainerid>")
+if len(sys.argv) <= 4:
+  print("adduser.py <username> <device> <level 0=none 1=user 2=trainer> <trainerid> <optional_badge>")
   sys.exit()
 
 username = sys.argv[1]
@@ -39,7 +34,8 @@ device   = sys.argv[2]
 level    = sys.argv[3]
 trainer  = sys.argv[4]
 
-if not C_debug:
+if not len(sys.argv) == 6:
+  ser = serial.Serial(C_serial, C_serialspeed)
   # so the first time we scan we get 1 thing of junk
   # the next scans we get 2 things of junk
   print("Scan Badge")
@@ -48,7 +44,7 @@ if not C_debug:
     print("Scan Badge")
     message = ser.readline()[2:-4].strip()
 else:
-  message = "04001D4868"
+  message = sys.argv[5].strip()
 
 #pdb.set_trace()
 
