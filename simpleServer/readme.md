@@ -71,14 +71,14 @@ Steps to install the software
 user access is done through the adduser.py script which is located within the server
 directory.
 
-    adduser.py <username> <device> <level 0=none 1=user 2=trainer> <trainerid> <optional_badge_id>
+    adduser.py <user's_full_name> <device_id> <level 0=none 1=user 2=trainer> <trainer's_id> <optional_badge_id>
 
 The adduser script reads run.cfg to figure out the serial port and serial port speed
 at which to scan for the badge code.  Once you run the adduser command with the
 above options, it'll then ask you to scan the badge of the user you are entering
 access for.
 
-if you specify the optional<sub>badge</sub><sub>id</sub> the serial port won't be used to scan the badge, and
+if you specify the optional_badge_id the serial port won't be used to scan the badge, and
 it'll use that value as the badge code.
 
 ### starting the utility<a id="sec-1-2-1" name="sec-1-2-1"></a>
